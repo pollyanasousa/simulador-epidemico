@@ -119,6 +119,14 @@ H(0) = 0          F(0) = 0     Rec(0) = 0
 
 ---
 
+## 🌐 Acesse Online
+
+O simulador está hospedado e disponível publicamente via GitHub Pages:
+
+**👉 https://pollyanasousa.github.io/simulador-epidemico/**
+
+---
+
 ## 🚀 Como Rodar Localmente
 
 Não é necessário instalar nada. Basta:

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador Epidemiológico SEIR</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Lato:ital@1&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
+    };
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-cml.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════ HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="header-logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="16" stroke="#4A90D9" stroke-width="2"/>
+          <circle cx="18" cy="18" r="8"  stroke="#7EB8F7" stroke-width="1.5"/>
+          <circle cx="18" cy="18" r="3"  fill="#4A90D9"/>
+          <line x1="18" y1="2"  x2="18" y2="10" stroke="#4A90D9" stroke-width="1.5"/>
+          <line x1="18" y1="26" x2="18" y2="34" stroke="#4A90D9" stroke-width="1.5"/>
+          <line x1="2"  y1="18" x2="10" y2="18" stroke="#4A90D9" stroke-width="1.5"/>
+          <line x1="26" y1="18" x2="34" y2="18" stroke="#4A90D9" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <h1>Simulador Epidemiológico SEIR</h1>
+          <p class="header-sub">Modelo Estendido com Compartimentos Clínicos</p>
+        </div>
+      </div>
+      <div class="header-badge">v1.0 · Euler dt=0.1</div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════ TABS NAV -->
+  <nav class="tab-nav">
+    <div class="tab-nav-inner">
+      <button class="tab-btn active" data-tab="inicio">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1 6v9h5v-5h4v5h5V6z"/></svg>
+        Início
+      </button>
+      <button class="tab-btn" data-tab="sobre">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm.75 10.5h-1.5v-5h1.5v5zm0-6.5h-1.5V3.5h1.5V5z"/></svg>
+        Sobre o Modelo
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════ TAB: INÍCIO -->
+  <main id="tab-inicio" class="tab-content active">
+
+    <!-- ── Painel 1: Dinâmica da Transmissão ── -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-icon transmission-icon">⚡</span>
+        <div>
+          <h2>Dinâmica da Transmissão</h2>
+          <p class="panel-desc">Parâmetros populacionais e de transmissibilidade do agente infeccioso</p>
+        </div>
+        <div class="rt-badge" id="rt-display">
+          <span class="rt-label">R<sub>t</sub></span>
+          <span class="rt-value" id="rt-value">—</span>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <!-- Sliders coluna esquerda -->
+        <div class="controls-col">
+          <h3 class="controls-title">Parâmetros Populacionais</h3>
+
+          <div class="slider-group">
+            <label>População Total (N)</label>
+            <div class="slider-row">
+              <span class="slider-min">1.000</span>
+              <div class="slider-wrap">
+                <input type="range" id="N" min="1000" max="1500000000" step="1000" value="1000000" />
+                <span class="slider-val" id="N-val">1.000.000</span>
+              </div>
+              <span class="slider-max">1,5 Bi</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Infectados Iniciais (I₀)</label>
+            <div class="slider-row">
+              <span class="slider-min">1</span>
+              <div class="slider-wrap">
+                <input type="range" id="I0" min="1" max="1000" step="1" value="10" />
+                <span class="slider-val" id="I0-val">10</span>
+              </div>
+              <span class="slider-max">1.000</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Tempo de Simulação (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">2</span>
+              <div class="slider-wrap">
+                <input type="range" id="Tsim" min="2" max="200" step="1" value="100" />
+                <span class="slider-val" id="Tsim-val">100</span>
+              </div>
+              <span class="slider-max">200</span>
+            </div>
+          </div>
+
+          <h3 class="controls-title" style="margin-top:1.5rem;">Transmissibilidade</h3>
+
+          <div class="slider-group">
+            <label>Número Reprodutivo Básico (R₀)</label>
+            <div class="slider-row">
+              <span class="slider-min">0,01</span>
+              <div class="slider-wrap">
+                <input type="range" id="R0" min="0.01" max="10" step="0.01" value="2.5" />
+                <span class="slider-val" id="R0-val">2,50</span>
+              </div>
+              <span class="slider-max">10</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Redução na Transmissão θ (NPIs)</label>
+            <div class="slider-row">
+              <span class="slider-min">0</span>
+              <div class="slider-wrap">
+                <input type="range" id="theta" min="0" max="1" step="0.01" value="0" />
+                <span class="slider-val" id="theta-val">0,00</span>
+              </div>
+              <span class="slider-max">1</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Tempo Infeccioso — T<sub>inf</sub> (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">0</span>
+              <div class="slider-wrap">
+                <input type="range" id="Tinf" min="0.1" max="24" step="0.1" value="5" />
+                <span class="slider-val" id="Tinf-val">5,0</span>
+              </div>
+              <span class="slider-max">24</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Período de Incubação — T<sub>inc</sub> (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">0,15</span>
+              <div class="slider-wrap">
+                <input type="range" id="Tinc" min="0.15" max="24" step="0.05" value="5.2" />
+                <span class="slider-val" id="Tinc-val">5,2</span>
+              </div>
+              <span class="slider-max">24</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="chart-col">
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#27AE60"></span> Exposto
+            <span class="legend-dot" style="background:#E67E22; margin-left:1rem;"></span> Infectado
+            <span class="legend-dot" style="background:#2980B9; margin-left:1rem;"></span> Removido
+          </div>
+          <div class="chart-container">
+            <canvas id="chartTransmissao"></canvas>
+          </div>
+          <p class="chart-note">
+            R<sub>t</sub> = (1 − θ) × R₀ &nbsp;|&nbsp; β = R<sub>t</sub> / T<sub>inf</sub> &nbsp;|&nbsp; σ = 1 / T<sub>inc</sub> &nbsp;|&nbsp; γ = 1 / T<sub>inf</sub>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Painel 2: Dinâmica Clínica ── -->
+    <section class="panel">
+      <div class="panel-header">
+        <span class="panel-icon clinical-icon">🏥</span>
+        <div>
+          <h2>Dinâmica Clínica</h2>
+          <p class="panel-desc">Parâmetros de mortalidade, recuperação e assistência hospitalar</p>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <!-- Sliders coluna esquerda -->
+        <div class="controls-col">
+          <h3 class="controls-title">Mortalidade e Recuperação</h3>
+
+          <div class="slider-group">
+            <label>Letalidade — δ (%)</label>
+            <div class="slider-row">
+              <span class="slider-min">0%</span>
+              <div class="slider-wrap">
+                <input type="range" id="delta" min="0" max="100" step="0.1" value="2" />
+                <span class="slider-val" id="delta-val">2,0%</span>
+              </div>
+              <span class="slider-max">100%</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Tempo até Morte — T<sub>m</sub> (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">5,8</span>
+              <div class="slider-wrap">
+                <input type="range" id="Tm" min="5.8" max="100" step="0.1" value="14" />
+                <span class="slider-val" id="Tm-val">14,0</span>
+              </div>
+              <span class="slider-max">100</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Tempo de Internação — T<sub>int</sub> (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">0,1</span>
+              <div class="slider-wrap">
+                <input type="range" id="Tint" min="0.1" max="100" step="0.1" value="10" />
+                <span class="slider-val" id="Tint-val">10,0</span>
+              </div>
+              <span class="slider-max">100</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Tempo de Recuperação — T<sub>rec</sub> (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">0,1</span>
+              <div class="slider-wrap">
+                <input type="range" id="Trec" min="0.1" max="100" step="0.1" value="14" />
+                <span class="slider-val" id="Trec-val">14,0</span>
+              </div>
+              <span class="slider-max">100</span>
+            </div>
+          </div>
+
+          <h3 class="controls-title" style="margin-top:1.5rem;">Assistência Hospitalar</h3>
+
+          <div class="slider-group">
+            <label>Taxa de Hospitalização — τ (%)</label>
+            <div class="slider-row">
+              <span class="slider-min">1%</span>
+              <div class="slider-wrap">
+                <input type="range" id="tau" min="1" max="100" step="1" value="15" />
+                <span class="slider-val" id="tau-val">15%</span>
+              </div>
+              <span class="slider-max">100%</span>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <label>Tempo de Hospitalização — T<sub>hosp</sub> (dias)</label>
+            <div class="slider-row">
+              <span class="slider-min">0,1</span>
+              <div class="slider-wrap">
+                <input type="range" id="Thosp" min="0.1" max="100" step="0.1" value="7" />
+                <span class="slider-val" id="Thosp-val">7,0</span>
+              </div>
+              <span class="slider-max">100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfico Clínico -->
+        <div class="chart-col">
+          <div class="chart-legend">
+            <span class="legend-dot" style="background:#1A5C38"></span> Fatalidades
+            <span class="legend-dot" style="background:#D35400; margin-left:1rem;"></span> Hospitalizados
+            <span class="legend-dot" style="background:#1F618D; margin-left:1rem;"></span> Recuperados
+          </div>
+          <div class="chart-container">
+            <canvas id="chartClinico"></canvas>
+          </div>
+          <p class="chart-note">
+            μ = δ / T<sub>m</sub> &nbsp;|&nbsp; α = τ / T<sub>hosp</sub> &nbsp;|&nbsp; ρ = 1 / T<sub>rec</sub>
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════ TAB: SOBRE -->
+  <main id="tab-sobre" class="tab-content">
+    <section class="panel sobre-panel">
+      <h2 class="sobre-title">Modelo SEIR Estendido com Compartimentos Clínicos</h2>
+      <p class="sobre-intro">
+        Este simulador implementa um modelo SEIR (Suscetível–Exposto–Infectado–Removido) estendido,
+        com compartimentos adicionais para capturar a dinâmica clínica da doença: Hospitalizados (H),
+        Recuperados (R<sub>ec</sub>) e Fatalidades (F). A integração numérica utiliza o método de
+        Euler com passo temporal <em>dt = 0,1 dia</em>.
+      </p>
+
+      <div class="eq-block">
+        <h3>1. Fluxo de Compartimentos</h3>
+        <div class="eq-diagram">
+          <span class="eq-node S">S</span>
+          <span class="eq-arrow">→</span>
+          <span class="eq-node E">E</span>
+          <span class="eq-arrow">→</span>
+          <span class="eq-node I">I</span>
+          <span class="eq-arrow">→</span>
+          <div class="eq-branch">
+            <span class="eq-node H">H → F</span>
+            <span class="eq-node Rec">Rec</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="eq-block">
+        <h3>2. Equações Diferenciais</h3>
+        <div class="math-display">
+          $$\frac{dS}{dt} = -\beta \frac{S \cdot I}{N}$$
+          $$\frac{dE}{dt} = \beta \frac{S \cdot I}{N} - \sigma E$$
+          $$\frac{dI}{dt} = \sigma E - \gamma I$$
+          $$\frac{dH}{dt} = \tau \gamma I - \alpha H$$
+          $$\frac{dF}{dt} = \delta_m \cdot \alpha H$$
+          $$\frac{dR_{ec}}{dt} = (1-\delta_m)\cdot\alpha H + (1-\tau)\gamma I$$
+        </div>
+      </div>
+
+      <div class="eq-block">
+        <h3>3. Parâmetros do Modelo</h3>
+        <table class="param-table">
+          <thead>
+            <tr><th>Símbolo</th><th>Descrição</th><th>Derivação</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>$\beta$</td><td>Taxa de transmissão</td><td>$R_t / T_{inf}$</td></tr>
+            <tr><td>$R_t$</td><td>Número reprodutivo efetivo</td><td>$(1-\theta)\times R_0$</td></tr>
+            <tr><td>$\sigma$</td><td>Taxa de progressão da incubação</td><td>$1/T_{inc}$</td></tr>
+            <tr><td>$\gamma$</td><td>Taxa de remoção (infecciosa)</td><td>$1/T_{inf}$</td></tr>
+            <tr><td>$\tau$</td><td>Fração hospitalizada</td><td>parâmetro direto</td></tr>
+            <tr><td>$\alpha$</td><td>Taxa de saída hospitalar</td><td>$1/T_{hosp}$</td></tr>
+            <tr><td>$\delta_m$</td><td>Letalidade hospitalar</td><td>$\delta / 100$</td></tr>
+            <tr><td>$\theta$</td><td>Eficácia das NPIs</td><td>parâmetro direto (0–1)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="eq-block">
+        <h3>4. Condições Iniciais</h3>
+        <div class="math-display">
+          $$S(0) = N - I_0, \quad E(0) = 0, \quad I(0) = I_0$$
+          $$H(0) = 0, \quad F(0) = 0, \quad R_{ec}(0) = 0$$
+        </div>
+      </div>
+
+      <div class="eq-block">
+        <h3>5. Integração Numérica (Método de Euler)</h3>
+        <div class="math-display">
+          $$X(t + dt) = X(t) + \frac{dX}{dt}\bigg|_t \cdot dt, \quad dt = 0{,}1 \text{ dia}$$
+        </div>
+        <p class="sobre-note">
+          Todos os compartimentos são limitados inferiormente a zero: <code>max(0, X)</code>, garantindo
+          coerência biológica durante toda a simulação.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════ FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span>Simulador Epidemiológico SEIR &copy; 2025</span>
+      <span class="footer-sep">|</span>
+      <span>Modelo numérico em JavaScript puro &nbsp;·&nbsp; Gráficos: Chart.js &nbsp;·&nbsp; Equações: MathJax</span>
+      <span class="footer-sep">|</span>
+      <span>Desenvolvido com Claude (Anthropic)</span>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="js/main.js"></script>
+</body>
+</html>

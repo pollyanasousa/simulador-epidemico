@@ -6,7 +6,14 @@ Simulador interativo de dinâmica epidêmica baseado no modelo **SEIR estendido 
 
 ## 🎓 Contexto Acadêmico
 
-Este projeto foi desenvolvido como atividade prática de uma disciplina de curso superior, com o seguinte objetivo declarado pelo professor:
+| Campo | Informação |
+|---|---|
+| **Instituição** | Universidade Federal Rural de Pernambuco (UFRPE) |
+| **Curso** | Sistemas de Informação |
+| **Disciplina** | Sustentabilidade em Sistemas de Informação |
+| **Período** | 1º período |
+
+Este projeto foi desenvolvido como atividade prática da disciplina, com o seguinte objetivo declarado pelo professor:
 
 > *"Ilustrar a **insustentabilidade da mera prática de desenvolvimento de código, per si, como uma atividade da chamada 'escola de cursos superiores'** — e que um estudante, mesmo de 1º semestre, assumido sem conhecimento prévio algum, é capaz de construir e hospedar um código minimamente complexo e que funcione a contento, e que ele não entende nem a complexidade do problema, nem tampouco a do código escrito."*
 

@@ -165,6 +165,8 @@ simulador-epidemico/
 │   └── style.css       # Estilo científico: header azul, sliders customizados, layout responsivo
 ├── js/
 │   └── main.js         # Motor SEIR (Euler dt=0.1), lógica dos sliders, gráficos Chart.js
+├── ARTIGO.md           # Artigo científico acadêmico descrevendo o simulador e a experiência
+├── PROMPT.md           # Prompt integral utilizado para gerar o simulador e o artigo
 └── README.md           # Este arquivo
 ```
 
@@ -191,6 +193,23 @@ O prompt completo descreveu toda a estrutura de arquivos, os parâmetros epidemi
 ### IA utilizada
 
 Este projeto foi desenvolvido integralmente com **[Claude](https://claude.ai)** (Anthropic) — modelo **Claude Sonnet 4**, por meio da interface claude.ai.
+
+---
+
+## 📝 Artigo Científico
+
+Como parte da mesma atividade acadêmica, foi produzido um artigo científico em formato acadêmico formal descrevendo o simulador, o modelo SEIR estendido, a implementação técnica e uma reflexão crítica sobre o uso de IA generativa no ensino de programação no ensino superior.
+
+| Campo | Informação |
+|---|---|
+| **Título** | Simulação Epidemiológica Interativa com Modelo SEIR Estendido: Uma Experiência de Desenvolvimento Mediado por Inteligência Artificial Generativa e suas Implicações para o Ensino de Programação no Ensino Superior |
+| **Autora** | Pollyana Sousa |
+| **Arquivo** | [`ARTIGO.md`](./ARTIGO.md) |
+| **IA utilizada** | Claude Sonnet 4.6 (Anthropic) — https://claude.ai |
+
+O artigo contém: Resumo, Introdução, Fundamentação Teórica, Implementação, Resultados e Discussão, Reflexão Crítica, Conclusão, Referências e dois apêndices com os prompts utilizados para gerar o simulador e o próprio artigo.
+
+Assim como o simulador, **o artigo não foi escrito manualmente** — foi gerado integralmente por IA a partir de um prompt em linguagem natural, com declaração explícita desse fato no próprio texto.
 
 ---
 
